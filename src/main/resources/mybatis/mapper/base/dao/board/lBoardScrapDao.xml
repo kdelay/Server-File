@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.board.dao.BoardScrapDao">
+
+
+ <insert id="BoardScrapPostDao" parameterType="java.util.HashMap">
+        insert into boardscrap (user_id, username, board_id, board_type)
+             values (#{userId}, #{username}, #{boardId}, #{boardType});
+</insert>
+
+
+<delete id="BoardTextDeleteDao" parameterType="java.util.HashMap">
+        delete from boardscrap    
+        where board_id = #{boardId} and user_id = #{userId};
+</delete>
+    	
+<select id="BoardScrapUserIdListDao" resultType="com.example.demo.board.vo.BoardScrapVo" parameterType="java.util.HashMap">
+        select board_id, board_type from boardscrap where user_id = #{userId};
+</select>
+</mapper>
+
+
+
+
+<!-- public int BoardScrapPostDao(Map<String, String> map);
+	public int BoardScrapDeleteDao(Map<String, String> map);
+	
+	
+	// 유저 아이디로 글 아이디 가져옴
+	public List<BoardScrapVo> BoardScrapUserIdListDao(Map<String, String> map); -->

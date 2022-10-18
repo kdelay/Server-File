@@ -1,0 +1,450 @@
+package com.example.demo.board.service;
+
+import java.io.File;
+import java.io.IOException;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.example.demo.board.dao.BoardCommentDao;
+import com.example.demo.board.dao.BoardImgInfoDao;
+import com.example.demo.board.dao.BoardRecommendDao;
+import com.example.demo.board.dao.BoardScrapDao;
+import com.example.demo.board.dao.BoardTextInfoDao;
+import com.example.demo.board.dao.ConnectBoardImgDao;
+import com.example.demo.board.vo.BoardCommentVo;
+import com.example.demo.board.vo.BoardImgInfoVo;
+import com.example.demo.board.vo.BoardRecommendVo;
+import com.example.demo.board.vo.BoardScrapVo;
+import com.example.demo.board.vo.BoardTextInfoVo;
+import com.example.demo.board.vo.ConnectBoardImgVo;
+import com.example.demo.security.jwt.util.JwtUtil;
+
+@Service
+public class BoardServiceimpl implements BoardService{
+	@Autowired
+	JwtUtil JwtUtil;
+	@Autowired
+	BoardTextInfoDao BoardTextInfoDao;
+	@Autowired
+	BoardImgInfoDao BoardImgInfoDao;
+	@Autowired
+	BoardCommentDao BoardCommentDao;
+	@Autowired
+	BoardRecommendDao BoardRecommendDao;
+	@Autowired
+	BoardScrapDao BoardScrapDao;
+	@Autowired
+	ConnectBoardImgDao ConnectBoardImgDao;
+	
+	@Override
+	public List<BoardTextInfoVo> BoardTextAllList() {
+		List<BoardTextInfoVo> result = BoardTextInfoDao.BoardTextAllListDao();
+		return result;
+	}
+	
+	// 게시판 타입 조회
+	@Override
+	public List<BoardTextInfoVo> BoardTextTypeList(String boardType) {
+		
+		Map<String, String> paramMap = new HashMap<String,String>();
+		paramMap.put("boardType", boardType);
+		
+		List<BoardTextInfoVo> list = BoardTextInfoDao.BoardTextTypeListDao(paramMap);
+        return list;
+        
+	}
+	// 게시글 추천수 증가
+	@Override
+	public int BoardTextRecommend(String boardId) {
+		
+		Map<String, String> paramMap = new HashMap<String,String>();
+		paramMap.put("boardId", boardId);
+		int result = BoardTextInfoDao.BoardTextRecommendDao(paramMap);		
+		return result;
+	}
+	
+	//게시글 작성
+	@Override
+	public String BoardTextPost(String token, BoardTextInfoVo BoardTextInfoVo) {
+		String userid = JwtUtil.getUserIdFromToken(token);
+		String username = JwtUtil.getUsernameFromToken(token);
+		String usernickname = JwtUtil.getuserNickNameFromToken(token);
+		
+		ZoneOffset seoulZoneOffset = ZoneOffset.of("+09:00");
+		String currentout = ZonedDateTime.now(seoulZoneOffset).toString();
+		String millisecond = currentout.substring(20,29);
+		UUID uuid = UUID.randomUUID();
+		String uuids[] = uuid.toString().split("-");
+		String boardId = uuids[0]+millisecond;
+		
+		System.out.println(BoardTextInfoVo.getBoardType());
+		
+		Map<String, String> paramMap = new HashMap<String,String>();
+		paramMap.put("boardId", boardId);
+		paramMap.put("boardType", BoardTextInfoVo.getBoardType());
+		paramMap.put("boardTitle", BoardTextInfoVo.getBoardTitle());
+		paramMap.put("boardContent", BoardTextInfoVo.getBoardContent());		  
+		paramMap.put("boardCreateAt", currentout.substring(0, 19));
+		paramMap.put("boardUpdateAt", currentout.substring(0, 19));
+		paramMap.put("userId", userid);
+		paramMap.put("username", username);
+		paramMap.put("userNickname", usernickname);
+		
+//		int result = 
+		BoardTextInfoDao.BoardTextPostDao(paramMap);
+		// 게시글 이미지의 연결 테이블을 위한 게시글 아이디 리턴
+		return boardId;
+	}
+	
+	// 개시글 수정
+	@Override
+	public int BoardTextPut(BoardTextInfoVo BoardTextInfoVo, String boardId) {
+		ZoneOffset seoulZoneOffset = ZoneOffset.of("+09:00");
+		String currentout = ZonedDateTime.now(seoulZoneOffset).toString();
+		
+		Map<String, String> paramMap = new HashMap<String,String>();
+		paramMap.put("boardId", boardId);
+		paramMap.put("boardTitle", BoardTextInfoVo.getBoardTitle());
+		paramMap.put("boardContent", BoardTextInfoVo.getBoardContent());
+		paramMap.put("boardUpdateAt", currentout.substring(0, 19));
+		
+		int result = BoardTextInfoDao.BoardTextPutDao(paramMap);
+		
+		return result;
+	}
+	
+	//게시글 삭제
+	@Override
+	public int BoardTextDelete(String boardId) {
+		Map<String, String> paramMap = new HashMap<String,String>();
+		paramMap.put("boardId", boardId);
+		
+
+		int result = BoardTextInfoDao.BoardTextDeleteDao(paramMap);
+		
+		return result;
+	}
+	
+	//이미지 정보 업로드
+	@Override
+	public List<String> BoardImgInfoUpload(MultipartFile[] file) {
+		String fileRealName; //파일 이름
+		  String size; // 파일 사이즈
+		  String fileExtension; //파일 확장자
+		  String uploadFolder = "C:\\testimg\\board";
+		  String uniqueName; //서버에 저장할 파일 이름		  
+		  /*
+		  파일 업로드시 파일명이 동일한 파일이 이미 존재할 수도 있고 사용자가 
+		  업로드 하는 파일명이 언어 이외의 언어로 되어있을 수 있습니다. 
+		  타인어를 지원하지 않는 환경에서는 정산 동작이 되지 않습니다.(리눅스가 대표적인 예시)
+		  고유한 랜던 문자를 통해 db와 서버에 저장할 파일명을 새롭게 만들어 준다.
+		 */
+		  UUID uuid = UUID.randomUUID();
+		  List<String> uuidlist = new ArrayList<String>();
+//		  Instant current = Instant.now();
+		  ZoneOffset seoulZoneOffset = ZoneOffset.of("+09:00");
+		  String currentout = ZonedDateTime.now(seoulZoneOffset).toString();
+		  System.out.println("Current Instant = "+ currentout);
+		  
+		  for(int i=0; i<file.length; i++) {
+			  fileRealName = file[i].getOriginalFilename();
+			  size = String.valueOf(file[i].getSize());
+			  fileExtension = fileRealName.substring(fileRealName.lastIndexOf("."),fileRealName.length());
+			  uuid = UUID.randomUUID();
+			  String uuids = uuid.toString().replace("-","");
+			  uuidlist.add(uuids+fileExtension);
+			  uniqueName = uuids;
+	
+			  File saveFile = new File(uploadFolder+"\\" + uniqueName + fileExtension);  // 적용 후
+				try {
+					file[i].transferTo(saveFile);  // 실제 파일 저장메서드(filewriter 작업을 손쉽게 한방에 처리해준다.)
+				} catch (IllegalStateException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
+				Map<String, String> paramMap = new HashMap<String,String>();
+				  paramMap.put("fileUniqueName", uniqueName);
+				  paramMap.put("fileRealName", fileRealName);
+				  paramMap.put("fileSize", size);
+				  paramMap.put("fileExtension", fileExtension);
+				  paramMap.put("fileUploadFolder", uploadFolder);
+				  paramMap.put("fileUploadTime", currentout.substring(0, 19));
+
+				  int result = BoardImgInfoDao.BoardImgInfoUploadDao(paramMap);
+		  }
+		  // 연결테이블 요청을 위한 고유아이디 + 확장자의 리스트 리턴
+		  return uuidlist;
+	}
+	
+	///////////////// 이미지 고유아디로 이미지 정보 서칭
+	@Override
+	public List<BoardImgInfoVo> BoardImgInfoSearch(String fileUniqueName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	///////////////// 기능 의미 없는거 같아서 구현 x
+	
+	
+	// 게시글 이미지 연결 테이블 작성
+	@Override
+	public int ConnectBoardImgPost(ConnectBoardImgVo ConnectBoardImgVo) {
+		ZoneOffset seoulZoneOffset = ZoneOffset.of("+09:00");
+		String currentout = ZonedDateTime.now(seoulZoneOffset).toString();
+		
+		Map<String, String> paramMap = new HashMap<String,String>();		  
+		  paramMap.put("boardId", ConnectBoardImgVo.getBoardId());
+		  paramMap.put("boardType", ConnectBoardImgVo.getBoardType());
+		  paramMap.put("fileUniqueName", ConnectBoardImgVo.getFileUniqueName());
+		  paramMap.put("createAt", currentout.substring(0, 19));
+		  paramMap.put("updateAt", currentout.substring(0, 19));
+		  
+		int result = ConnectBoardImgDao.ConnectBoardImgPostDao(paramMap);
+		  
+		return result;
+	}
+	// 게시글 아이디로 연결 테이블 삭제 => 게시글이 삭제 되거나 수정 될때 실행
+	@Override
+	public int ConnectBoardImgDelete(String boardId) {
+		Map<String, String> paramMap = new HashMap<String,String>();		  
+		  paramMap.put("boardId", boardId);
+		  
+		int result = ConnectBoardImgDao.ConnectBoardImgDeleteDao(paramMap);
+		  
+		return result;
+	}
+	
+	// 게시판 타입으로 글과 연결된 이미지 전체 검색
+	@Override
+	public List<ConnectBoardImgVo> ConnectBoardImgTypeList(String boardType) {
+		Map<String, String> paramMap = new HashMap<String,String>();		  
+		  paramMap.put("boardType", boardType);
+		
+		 List<ConnectBoardImgVo> list = ConnectBoardImgDao.ConnectBoardImgTypeListDao(paramMap);
+		  
+		return list;
+	}
+	
+	// 게시글 아이디로 글과 연결된 이미지 검색
+	@Override
+	public List<ConnectBoardImgVo> ConnectBoardImgBoardIdList(String boardId) {
+		Map<String, String> paramMap = new HashMap<String,String>();		  
+		  paramMap.put("boardId", boardId);
+		
+		List<ConnectBoardImgVo> list = ConnectBoardImgDao.ConnectBoardImgBoardIdListDao(paramMap);
+		return list;
+	}
+	
+	// 댓글 작성
+	@Override
+	public int BoardCommentPost(String token, BoardCommentVo BoardCommentVo) {
+		String userid = JwtUtil.getUserIdFromToken(token);
+		String username = JwtUtil.getUsernameFromToken(token);
+		String usernickname = JwtUtil.getuserNickNameFromToken(token);
+		
+		ZoneOffset seoulZoneOffset = ZoneOffset.of("+09:00");
+		String currentout = ZonedDateTime.now(seoulZoneOffset).toString();
+		String millisecond = currentout.substring(20,29);
+		UUID uuid = UUID.randomUUID();
+		String uuids[] = uuid.toString().split("-");
+		String commentId = uuids[0]+millisecond;
+		
+		Map<String, String> paramMap = new HashMap<String,String>();
+		paramMap.put("boardId", BoardCommentVo.getBoardId());
+		paramMap.put("boardType", BoardCommentVo.getBoardType());
+		paramMap.put("userId", userid);
+		paramMap.put("username", username);
+		paramMap.put("userNickname", usernickname);
+		paramMap.put("commentId", commentId);
+		
+		if(BoardCommentVo.getCommentParentsId() != null) {
+			paramMap.put("commentParentsId", BoardCommentVo.getCommentParentsId());
+			paramMap.put("commentLayer", "2");
+		}
+		paramMap.put("commentLayer", "1");
+		paramMap.put("commentContent", BoardCommentVo.getCommentContent());
+		paramMap.put("commentCreateAt", currentout.substring(0, 19));
+		paramMap.put("commentUpdateAt", currentout.substring(0, 19));
+		
+		int result = BoardCommentDao.BoardCommentPostDao(paramMap);
+		
+		return result;
+	}
+	
+	// 댓글 수정
+	@Override
+	public int BoardCommentPut(BoardCommentVo BoardCommentVo, String commentId) {
+		Map<String, String> paramMap = new HashMap<String,String>();
+		paramMap.put("commentId", commentId);
+		paramMap.put("commentContent", BoardCommentVo.getCommentContent());
+		
+		int result = BoardCommentDao.BoardCommentPutDao(paramMap);
+		return 0;
+	}
+	
+	//댓글 삭제 => 2가지 동작
+	// 하위 레이어 삭제 => 그 대댓글만 삭제
+	// 상위 레이어 삭제 => 연결된 모든 하위 레이어(대댓글) 전부 삭제
+	@Override
+	public int BoardCommentDelete(String commentId , String commentLayer) {
+		
+		int result = 0;
+		
+		if(commentLayer=="1") {
+			Map<String, String> paramMap = new HashMap<String,String>();
+			paramMap.put("commentId", commentId);
+			
+			BoardCommentDao.BoardCommentDeleteDao(paramMap);
+			BoardCommentDeletelayer2(commentId);
+			
+//			BoardCommentDao.BoardCommentDeletelayer2Dao(paramMap);
+			
+			result = 1; 
+		}
+		else if(commentLayer == "2") {
+			Map<String, String> paramMap = new HashMap<String,String>();
+			paramMap.put("commentId", commentId);
+			
+			result = BoardCommentDao.BoardCommentDeleteDao(paramMap);
+		}
+		
+		return result;
+	}
+	
+	// 상위 레이어 삭제 => 연결된 모든 하위 레이어(대댓글) 전부 삭제
+	@Override
+	public int BoardCommentDeletelayer2(String commentId) {
+		Map<String, String> paramMap = new HashMap<String,String>();
+		paramMap.put("commentId", commentId);
+		
+		int result = BoardCommentDao.BoardCommentDeletelayer2Dao(paramMap);
+		
+		return result;
+	}
+	
+	
+	//boardid의 댓글, 대댓글 몰 리스트
+	@Override
+	public List<BoardTextInfoVo> BoardCommentAllList() {
+		List<BoardTextInfoVo> result = BoardCommentDao.BoardCommentAllListDao();
+		return result;
+	}
+	
+	//개시글 아이디로 연관 댓글 검색
+	@Override
+	public List<BoardTextInfoVo> BoardCommentBoardIdList(String boardId) {
+		Map<String, String> paramMap = new HashMap<String,String>();
+		paramMap.put("boardId", boardId);
+		List<BoardTextInfoVo> result = BoardCommentDao.BoardCommentBoardIdListDao(paramMap);
+		// TODO Auto-generated method stub
+		return result;
+	}
+	
+	///////////////////////////// 레이어 마다 검색 기능 임
+	@Override
+	public List<BoardTextInfoVo> BoardCommentLayer1List(Map<String, String> map) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public List<BoardTextInfoVo> BoardCommentLayer2List(Map<String, String> map) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	///////////////////////////// 의미불명
+	
+	//추천 관련
+	//해당 게시글에 추천 누름
+	@Override
+	public int BoardRecommendPost(String token, BoardRecommendVo BoardRecommendVo) {
+		String userid = JwtUtil.getUserIdFromToken(token);
+		String username = JwtUtil.getUsernameFromToken(token);
+		
+		
+		Map<String, String> paramMap = new HashMap<String,String>();
+		paramMap.put("userId", userid);
+		paramMap.put("username", username);
+		paramMap.put("boardId", BoardRecommendVo.getBoardId());
+		paramMap.put("boardType", BoardRecommendVo.getBoardType());
+		
+		int result = BoardRecommendDao.BoardRecommendPostDao(paramMap);
+		
+		return result;
+	}
+	
+	//해당 글 추천 눌렀다 취소함
+	@Override
+	public int BoardRecommendDelete(String token, String boardId) {
+		String userid = JwtUtil.getUserIdFromToken(token);
+
+		Map<String, String> paramMap = new HashMap<String,String>();
+		paramMap.put("userId", userid);
+		paramMap.put("boardId", boardId);
+		
+		int result = BoardRecommendDao.BoardRecommendDeleteDao(paramMap);
+		return result;
+	}
+	
+	// 해당 유저가 추천 누른 게시글 아이디, 타입
+	@Override
+	public List<BoardRecommendVo> BoardRecommendSerch(String token) {
+		String userid = JwtUtil.getUserIdFromToken(token);
+
+		Map<String, String> paramMap = new HashMap<String,String>();
+		paramMap.put("userId", userid);
+		
+		List<BoardRecommendVo> result = BoardRecommendDao.BoardRecommendSerchDao(paramMap);
+		return result;
+	}
+	
+	//글 스크랩 관련
+	//해당 유저가 특정 글 스크랩 함
+	@Override
+	public int BoardScrapPost(String token, BoardScrapVo BoardScrapVo) {
+		String userid = JwtUtil.getUserIdFromToken(token);
+		String username = JwtUtil.getUsernameFromToken(token);
+		
+		
+		Map<String, String> paramMap = new HashMap<String,String>();
+		paramMap.put("userId", userid);
+		paramMap.put("username", username);
+		paramMap.put("boardId", BoardScrapVo.getBoardId());
+		paramMap.put("boardType", BoardScrapVo.getBoardType());
+		
+		int result = BoardScrapDao.BoardScrapPostDao(paramMap);
+		
+		return result;
+	}
+	
+	@Override
+	public int BoardScrapDelete(String token, String boardId) {
+		String userid = JwtUtil.getUserIdFromToken(token);
+
+		Map<String, String> paramMap = new HashMap<String,String>();
+		paramMap.put("userId", userid);
+		paramMap.put("boardId", boardId);
+		
+		int result = BoardScrapDao.BoardScrapDeleteDao(paramMap);
+		return result;
+	}
+	@Override
+	public List<BoardScrapVo> BoardScrapUserIdList(String token, String boardId) {
+		String userid = JwtUtil.getUserIdFromToken(token);
+
+		Map<String, String> paramMap = new HashMap<String,String>();
+		paramMap.put("userId", userid);
+		
+		List<BoardScrapVo> result = BoardScrapDao.BoardScrapUserIdListDao(paramMap);
+		return result;
+	}	
+}

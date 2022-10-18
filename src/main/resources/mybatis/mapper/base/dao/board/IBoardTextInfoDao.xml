@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.board.dao.BoardTextInfoDao">
+    <!-- 조회 설정 -->
+    <select id="BoardTextAllListDao" resultType="com.example.demo.board.vo.BoardTextInfoVo">
+        select * from boardtextinfo;
+    </select>
+    
+    <select id="BoardTextTypeListDao" resultType="com.example.demo.board.vo.BoardTextInfoVo">
+        select * from boardtextinfo
+         where board_type = #{boardType};
+    </select>
+    
+    
+    
+    
+    <!-- 작성,수정,삭제  -->
+    <insert id="BoardTextPostDao" parameterType="java.util.HashMap">
+        insert into boardtextinfo (board_id, board_type, board_title, board_content, board_create_at, board_update_at, user_id, username, user_nickname)
+             values (#{boardId}, #{boardType}, #{boardTitle}, #{boardContent}, #{boardCreateAt}, #{boardUpdateAt}, #{userId}, #{username}, #{userNickname});
+    </insert>
+
+     <update id="BoardTextPutDao" parameterType="java.util.HashMap">
+        update boardtextinfo 
+        set board_title = #{boardTitle}, board_content = #{boardContent}, board_update_at = #{boardUpdateAt}  
+        where board_id = #{boardId};
+    </update>
+    
+    <delete id="BoardTextDeleteDao" parameterType="java.util.HashMap">
+        delete from boardtextinfo    
+        where board_id = #{boardId};
+   	</delete>
+    
+        
+        
+    <!-- 추천수 카운트 -->
+    <update id="BoardTextRecommendDao" parameterType="java.util.HashMap">
+        update boardtextinfo 
+        set board_recommed_count = boardtextinfo.board_recommed_count + 1
+        where board_id = #{boardId};
+    </update>
+   
+</mapper>

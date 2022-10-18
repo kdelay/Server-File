@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.security.dao.UserDao">
+    
+    <select id="UserSearchDao" resultType="com.example.demo.security.vo.UserVo" parameterType="java.util.HashMap">
+        select * from user where username = #{username} ;
+    </select>
+    
+    <insert id="UserSignUpDao" parameterType="java.util.HashMap">
+        insert into user (username, password, user_role, user_email, user_nickname, user_gender, user_dob, create_at, update_at)
+             values (#{username}, #{password}, #{userRole}, #{userEmail}, #{userNickName}, #{userGender}, #{userDOB}, #{createAT}, #{updateAT})
+    	</insert>
+</mapper>
