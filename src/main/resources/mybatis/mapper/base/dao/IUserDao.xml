@@ -10,7 +10,22 @@
     </select>
     
     <insert id="UserSignUpDao" parameterType="java.util.HashMap">
-        insert into user (username, password, user_role, user_email, user_nickname, user_gender, user_dob, create_at, update_at)
+        insert into user (username, password, user_role, user_email, user_nickname, user_gender, user_dob, user_create_at, user_update_at)
              values (#{username}, #{password}, #{userRole}, #{userEmail}, #{userNickName}, #{userGender}, #{userDOB}, #{createAT}, #{updateAT})
-    	</insert>
+    </insert>
+    
+    
+    <select id="UsernameSearchDao" resultType="integer" parameterType="java.util.HashMap">
+        select count(username) from user where username = #{username} ;
+    </select>
+    
+    <select id="UserEmailSearchDao" resultType="integer" parameterType="java.util.HashMap">
+        select count(user_email) from user where user_email = #{userEmail} ;
+    </select>
+    
+    <select id="UserNicknameSearchDao" resultType="integer" parameterType="java.util.HashMap">
+        select count(user_nickname) from user where user_nickname = #{userNickName} ;
+    </select>
+    
+   
 </mapper>

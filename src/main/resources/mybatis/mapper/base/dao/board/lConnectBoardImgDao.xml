@@ -18,11 +18,11 @@
 </delete>
     	
 <select id="ConnectBoardImgTypeListDao" resultType="com.example.demo.board.vo.ConnectBoardImgVo" parameterType="java.util.HashMap">
-        select * from connectboardimg where board_type = #{boardType};
+        select board_id, board_type, file_unique_name from connectboardimg where board_type = #{boardType}  order by create_at DESC;
 </select>
 
 <select id="ConnectBoardImgBoardIdListDao" resultType="com.example.demo.board.vo.ConnectBoardImgVo" parameterType="java.util.HashMap">
-        select * from connectboardimg where board_id = #{boardId};
+        select board_id, board_type, file_unique_name from connectboardimg where board_id = #{boardId}  order by create_at DESC;
 </select>
 </mapper>
 

@@ -6,16 +6,19 @@
 <mapper namespace="com.example.demo.board.dao.BoardTextInfoDao">
     <!-- 조회 설정 -->
     <select id="BoardTextAllListDao" resultType="com.example.demo.board.vo.BoardTextInfoVo">
-        select * from boardtextinfo;
+        select * from boardtextinfo order by board_create_at DESC;
     </select>
     
-    <select id="BoardTextTypeListDao" resultType="com.example.demo.board.vo.BoardTextInfoVo">
-        select * from boardtextinfo
-         where board_type = #{boardType};
+    <select id="BoardTextTypeListDao" resultType="com.example.demo.board.vo.BoardTextInfoResultVo" parameterType="java.util.HashMap">
+        WITH textinfo  AS (
+		SELECT board_id, board_type, board_title, board_content, board_create_at, board_recommend_count,user_id, user_nickname FROM boardtextinfo)
+		, commentinfo  AS (
+		SELECT board_id, board_type, COUNT(comment_id) AS comment_count FROM boardcomment GROUP BY board_id)
+		SELECT t.*, c.comment_count FROM textinfo t LEFT JOIN  commentinfo c
+		ON (t.board_id = c.board_id AND t.board_type = c.board_type) 
+		WHERE t.board_type = #{boardType} order by t.board_create_at DESC
+
     </select>
-    
-    
-    
     
     <!-- 작성,수정,삭제  -->
     <insert id="BoardTextPostDao" parameterType="java.util.HashMap">
@@ -37,9 +40,15 @@
         
         
     <!-- 추천수 카운트 -->
-    <update id="BoardTextRecommendDao" parameterType="java.util.HashMap">
+    <update id="BoardTextRecommendUpDao" parameterType="java.util.HashMap">
         update boardtextinfo 
-        set board_recommed_count = boardtextinfo.board_recommed_count + 1
+        set board_recommend_count = boardtextinfo.board_recommend_count + 1
+        where board_id = #{boardId};
+    </update>
+    
+    <update id="BoardTextRecommendDawnDao" parameterType="java.util.HashMap">
+        update boardtextinfo 
+        set board_recommend_count = boardtextinfo.board_recommend_count - 1
         where board_id = #{boardId};
     </update>
    

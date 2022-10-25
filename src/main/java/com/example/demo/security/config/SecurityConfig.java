@@ -33,12 +33,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(userDetailsService);
     }
     
-    
     @Bean
     public PasswordEncoder passwordEncoder() {
        return new BCryptPasswordEncoder();
     }
-    
     
     @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
     @Override
@@ -48,7 +46,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
  
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable().authorizeRequests().antMatchers("/authenticate", "/api/v1/login", "/api/v1/signup", "/api/v1/boardlist", "/api/v1/boardlist/**")
+        http.csrf().disable().authorizeRequests().antMatchers("/api/v1/login", "/api/v1/signup", "/api/v1/signup/**",
+        		"/api/v1/boardlist", "/api/v1/boardlist/**", "/api/v1/boardimgconnect/**",
+        		"/api/v1/displayimg/**","/api/v1/commentlist/**",
+        		"/api/v1/resources/**")
                 .permitAll().anyRequest().authenticated()
                 .and().exceptionHandling().and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);

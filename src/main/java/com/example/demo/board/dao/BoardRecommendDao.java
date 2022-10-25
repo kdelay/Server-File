@@ -14,6 +14,7 @@ public interface BoardRecommendDao {
 	public int BoardRecommendDeleteDao(Map<String, String> map);
 	
 	
-	// 글아디디랑 우저 앙디 동시 검색 할듯
-	public List<BoardRecommendVo> BoardRecommendSerchDao(Map<String, String> map);
+	// 글아디디랑 우저 앙디 동시 검색 할듯 
+	public int BoardRecommendSerchDao(Map<String, String> map);
+	public int BoardRecommendCountSerchDao(Map<String, String> map);
 }

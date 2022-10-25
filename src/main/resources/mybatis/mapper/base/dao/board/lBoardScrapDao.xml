@@ -12,14 +12,29 @@
 </insert>
 
 
-<delete id="BoardTextDeleteDao" parameterType="java.util.HashMap">
+<delete id="BoardScrapDeleteDao" parameterType="java.util.HashMap">
         delete from boardscrap    
-        where board_id = #{boardId} and user_id = #{userId};
+        where user_id = #{userId} and board_id = #{boardId} and board_type = #{boardType};
 </delete>
     	
 <select id="BoardScrapUserIdListDao" resultType="com.example.demo.board.vo.BoardScrapVo" parameterType="java.util.HashMap">
-        select board_id, board_type from boardscrap where user_id = #{userId};
+        select * from boardscrap where user_id = #{userId}; 
 </select>
+
+<select id="BoardScrapBoardTypeListDao" resultType="com.example.demo.board.vo.BoardScrapVo" parameterType="java.util.HashMap">
+        select * from boardscrap where user_id = #{userId} and board_type = #{boardType}; 
+</select>
+
+<select id="BoardScrapBoardInfoListDao" resultType="com.example.demo.board.vo.BoardScrapBoardInfoVo" parameterType="java.util.HashMap">
+    WITH textinfo AS (
+	SELECT board_id, board_type, board_title, board_content, board_create_at, board_recommend_count, user_id, user_nickname FROM boardtextinfo)
+	, scrapinfo AS (
+	SELECT board_id, board_type, user_id AS scrap_user_id, username AS scrap_username FROM boardscrap)
+	SELECT t.*, s.scrap_user_id, s.scrap_username FROM textinfo t LEFT JOIN scrapinfo s
+	ON (t.board_id = s.board_id AND t.board_type = s.board_type)
+	WHERE s.scrap_user_id = #{userId}
+</select>
+
 </mapper>
 
 

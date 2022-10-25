@@ -1,31 +1,18 @@
 package com.example.demo.board.vo;
 
-public class BoardTextInfoVo {
+public class BoardScrapBoardInfoVo {
 	private String boardId    ;
 	private String boardType    ;
 	private String boardTitle   ;
 	private String boardContent;
 	private String boardCreateAt;
-	private String boardUpdateAt;
 	private int boardRecommendCount;
 	private String userId;
-	private String username;
 	private String userNickname;
 	private int commentCount;
+	private String scrapUsername;
+	private int scrapUserId;
 	
-	public int getCommentCount() {
-		return commentCount;
-	}
-	public void setCommentCount(int commentCount) {
-		this.commentCount = commentCount;
-	}
-	
-	public String getUserId() {
-		return userId;
-	}
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
 	public String getBoardId() {
 		return boardId;
 	}
@@ -56,29 +43,41 @@ public class BoardTextInfoVo {
 	public void setBoardCreateAt(String boardCreateAt) {
 		this.boardCreateAt = boardCreateAt;
 	}
-	public String getBoardUpdateAt() {
-		return boardUpdateAt;
-	}
-	public void setBoardUpdateAt(String boardUpdateAt) {
-		this.boardUpdateAt = boardUpdateAt;
-	}
 	public int getBoardRecommendCount() {
 		return boardRecommendCount;
 	}
 	public void setBoardRecommendCount(int boardRecommendCount) {
 		this.boardRecommendCount = boardRecommendCount;
 	}
-	public String getUsername() {
-		return username;
+	public String getUserId() {
+		return userId;
 	}
-	public void setUsername(String username) {
-		this.username = username;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 	public String getUserNickname() {
 		return userNickname;
 	}
 	public void setUserNickname(String userNickname) {
 		this.userNickname = userNickname;
+	}
+	public int getCommentCount() {
+		return commentCount;
+	}
+	public void setCommentCount(int commentCount) {
+		this.commentCount = commentCount;
+	}
+	public String getScrapUsername() {
+		return scrapUsername;
+	}
+	public void setScrapUsername(String scrapUsername) {
+		this.scrapUsername = scrapUsername;
+	}
+	public int getScrapUserId() {
+		return scrapUserId;
+	}
+	public void setScrapUserId(int scrapUserId) {
+		this.scrapUserId = scrapUserId;
 	}
 	
 	

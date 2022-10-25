@@ -6,11 +6,11 @@
 <mapper namespace="com.example.demo.board.dao.BoardCommentDao">
     <!-- 조회 설정 -->
     <select id="BoardCommentAllListDao" resultType="com.example.demo.board.vo.BoardCommentVo" parameterType="java.util.HashMap">
-        select * from boardcomment;
+        select * from boardcomment order by comment_create_at DESC;
     </select>
     
      <select id="BoardCommentBoardIdListDao" resultType="com.example.demo.board.vo.BoardCommentVo" parameterType="java.util.HashMap">
-        select * from boardcomment where board_id = #{boardId};
+        select * from boardcomment where board_id = #{boardId} order by comment_create_at DESC;
     </select>
     
     
@@ -25,14 +25,14 @@
     
     
     <!-- 작성,수정,삭제  -->
-    <insert id="BoardTextPostDao" parameterType="java.util.HashMap">
+    <insert id="BoardCommentPostDao" parameterType="java.util.HashMap">
         insert into boardcomment (board_id, board_type, user_id, username, user_nickname, 
         comment_id, comment_parents_id, comment_content, comment_layer, comment_create_at, comment_update_at)
              values (#{boardId}, #{boardType}, #{userId}, #{username}, #{userNickname}, #{commentId}, #{commentParentsId}, #{commentContent}, 
              #{commentLayer}, #{commentCreateAt}, #{commentUpdateAt});
     </insert>
 
-     <update id="BoardTextPutDao" parameterType="java.util.HashMap">
+     <update id="BoardCommentPutDao" parameterType="java.util.HashMap">
         update boardcomment 
         set comment_content = #{commentContent}
         where comment_id = #{commentId};

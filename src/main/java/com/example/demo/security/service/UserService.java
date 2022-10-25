@@ -87,6 +87,28 @@ public class UserService implements UserDetailsService {
 //    	String usertoken = jwtUtil.generateToken(userinfo);
     }
     
+    public int UserSignUp_idserch(AuthRequestVo authrequestvo) {
+    	Map<String, String> userMap = new HashMap<String,String>();
+    	userMap.put("username", authrequestvo.getUsername());
+
+    	int result = dao.UsernameSearchDao(userMap);
+    	return result;
+    }
+    public int UserSignUp_emailserch(UserVo requestvo) {
+    	Map<String, String> userMap = new HashMap<String,String>();
+    	userMap.put("userEmail", requestvo.getUserEmail());
+    	System.out.println("*************************** email log : "+requestvo.getUserEmail());
+    	int result = dao.UserEmailSearchDao(userMap);
+    	return result;
+    }
+    public int UserSignUp_nicknameserch(UserVo requestvo) {
+    	Map<String, String> userMap = new HashMap<String,String>();
+    	userMap.put("userNickName", requestvo.getUserNickName());
+
+    	int result = dao.UserNicknameSearchDao(userMap);
+    	return result;
+    }
+    
     public int UserSignUp(UserVo request) {
     	Map<String, String> userMap = new HashMap<String,String>();
     	userMap.put("username", request.getUsername());

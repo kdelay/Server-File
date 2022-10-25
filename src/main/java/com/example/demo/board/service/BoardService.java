@@ -7,8 +7,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.board.vo.BoardCommentVo;
 import com.example.demo.board.vo.BoardImgInfoVo;
-import com.example.demo.board.vo.BoardRecommendVo;
+import com.example.demo.board.vo.BoardScrapBoardInfoVo;
 import com.example.demo.board.vo.BoardScrapVo;
+import com.example.demo.board.vo.BoardTextInfoResultVo;
 import com.example.demo.board.vo.BoardTextInfoVo;
 import com.example.demo.board.vo.ConnectBoardImgVo;
 
@@ -18,10 +19,11 @@ public interface BoardService {
 	// 게시판 테이블 요청
 	// 테이블 조회 요청
 	public List<BoardTextInfoVo> BoardTextAllList();
-	public List<BoardTextInfoVo> BoardTextTypeList(String boardType);
+	public List<BoardTextInfoResultVo> BoardTextTypeList(String boardType);
 	
 	//추천수 
-	public int BoardTextRecommend(String boardId);
+	public int BoardTextRecommendUp(String boardId);
+	public int BoardTextRecommendDawn(String boardId);
 	
 	// 게시판 작성, 수정, 삭제
 	public String BoardTextPost(String token, BoardTextInfoVo BoardTextInfoVo);
@@ -45,7 +47,7 @@ public interface BoardService {
 	//게시판 타입에 따른 올 조회
 	public List<ConnectBoardImgVo> ConnectBoardImgTypeList(String boardType);
 	//게시그 아이디로 조회
-	public List<ConnectBoardImgVo> ConnectBoardImgBoardIdList(String boardId);
+	public List<String> ConnectBoardImgBoardIdList(String boardId);
 	
 	
 	/////////////////////////////////////////////////////////////
@@ -78,21 +80,28 @@ public interface BoardService {
 	/////////////////////////////////////////////////////////////
 	// 추천 관련
 	// 작성 삭제
-	public int BoardRecommendPost(String token, BoardRecommendVo BoardRecommendVo);
+	public int BoardRecommendPost(String token, String boardId, String boardType);
 	public int BoardRecommendDelete(String token, String boardId);
 	
 	
-	// 글아디디랑 유저 아이디 동시 검색 할듯
-	public List<BoardRecommendVo> BoardRecommendSerch(String token);
+	// 추천 했는지 정보 확인 // 글아디디랑 유저 아이디 동시 검색 할듯
+	public int BoardRecommendSerch(String token, String boardid);
 	
+	//카운트 검색
+	public int BoardRecommendCountSerch(String boardid);
 	/////////////////////////////////////////////////////////////
 	// 스크랩 관련
 	// 작성 삭제
 	public int BoardScrapPost(String token, BoardScrapVo BoardScrapVo);
-	public int BoardScrapDelete(String token, String boardId);
+	public int BoardScrapDelete(String token, BoardScrapVo BoardScrapVo);
 	
 	
 	// 유저 아이디로 글 아이디 가져옴
-	public List<BoardScrapVo> BoardScrapUserIdList(String token, String boardId);
+	public List<BoardScrapVo> BoardScrapUserIdList(String token);
+	// 유저 아이디로 검색 후 타입 구분
+	public List<BoardScrapVo> BoardScrapBoardTypeList(String token, String boardType);
+	// 유저 아이디 검색 후 글 정보 추가 데이터
+	public List<BoardScrapBoardInfoVo> BoardScrapBoardInfoList(String token);
+	
 
 }

@@ -17,8 +17,12 @@
         where board_id = #{boardId} and user_id = #{userId};
 </delete>
     	
-<select id="BoardRecommendSerchDao" resultType="com.example.demo.board.vo.BoardRecommendVo" parameterType="java.util.HashMap">
-        select board_id, board_type from boardrecommend where user_id = #{userId};
+<select id="BoardRecommendSerchDao" resultType="integer" parameterType="java.util.HashMap">
+        select count(user_id) from boardrecommend where user_id = #{userId} and board_id = #{boardId};
+</select>
+
+<select id="BoardRecommendCountSerchDao" resultType="integer" parameterType="java.util.HashMap">
+        select count(board_id) from boardrecommend where board_id = #{boardId};
 </select>
 </mapper>
 

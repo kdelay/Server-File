@@ -66,5 +66,43 @@ public class SecurityController {
     	return AccessToken;
     }
     
+    @PostMapping("/api/v1/signup/idch")
+    public String signupidch(@RequestBody AuthRequestVo authRequest) {
+    	int result = UserService.UserSignUp_idserch(authRequest);
+    	String resstr = "";
+    	if(result == 1) {
+    		resstr = "fail";
+    	}else {
+    		resstr = "ok";
+    	}
+    	return resstr;
+    }
+    
+    
+    @PostMapping("/api/v1/signup/emailch")
+    public String signupemailch(@RequestBody UserVo authRequest) {
+    	int result = UserService.UserSignUp_emailserch(authRequest);
+    	String resstr = "";
+    	if(result == 1) {
+    		resstr = "fail";
+    	}else {
+    		resstr = "ok";
+    	}
+    	return resstr;
+    }
+    
+    
+    
+    @PostMapping("/api/v1/signup/nickch")
+    public String signupnickch(@RequestBody UserVo authRequest) {
+    	int result = UserService.UserSignUp_nicknameserch(authRequest);
+    	String resstr = "";
+    	if(result == 1) {
+    		resstr = "fail";
+    	}else {
+    		resstr = "ok";
+    	}
+    	return resstr;
+    }
     
 }

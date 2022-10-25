@@ -22,8 +22,9 @@ import com.example.demo.board.dao.BoardTextInfoDao;
 import com.example.demo.board.dao.ConnectBoardImgDao;
 import com.example.demo.board.vo.BoardCommentVo;
 import com.example.demo.board.vo.BoardImgInfoVo;
-import com.example.demo.board.vo.BoardRecommendVo;
+import com.example.demo.board.vo.BoardScrapBoardInfoVo;
 import com.example.demo.board.vo.BoardScrapVo;
+import com.example.demo.board.vo.BoardTextInfoResultVo;
 import com.example.demo.board.vo.BoardTextInfoVo;
 import com.example.demo.board.vo.ConnectBoardImgVo;
 import com.example.demo.security.jwt.util.JwtUtil;
@@ -53,24 +54,33 @@ public class BoardServiceimpl implements BoardService{
 	
 	// 게시판 타입 조회
 	@Override
-	public List<BoardTextInfoVo> BoardTextTypeList(String boardType) {
+	public List<BoardTextInfoResultVo> BoardTextTypeList(String boardType) {
 		
 		Map<String, String> paramMap = new HashMap<String,String>();
 		paramMap.put("boardType", boardType);
 		
-		List<BoardTextInfoVo> list = BoardTextInfoDao.BoardTextTypeListDao(paramMap);
+		List<BoardTextInfoResultVo> list = BoardTextInfoDao.BoardTextTypeListDao(paramMap);
         return list;
         
 	}
 	// 게시글 추천수 증가
 	@Override
-	public int BoardTextRecommend(String boardId) {
+	public int BoardTextRecommendUp(String boardId) {
 		
 		Map<String, String> paramMap = new HashMap<String,String>();
 		paramMap.put("boardId", boardId);
-		int result = BoardTextInfoDao.BoardTextRecommendDao(paramMap);		
+		int result = BoardTextInfoDao.BoardTextRecommendUpDao(paramMap);		
 		return result;
 	}
+	//게시글 추천수 감소 =//= 감소 동작 x 
+	@Override
+	public int BoardTextRecommendDawn(String boardId) {		
+		Map<String, String> paramMap = new HashMap<String,String>();
+		paramMap.put("boardId", boardId);
+		int result = BoardTextInfoDao.BoardTextRecommendDawnDao(paramMap);		
+		return result;
+	}
+	
 	
 	//게시글 작성
 	@Override
@@ -174,7 +184,7 @@ public class BoardServiceimpl implements BoardService{
 				}
 				
 				Map<String, String> paramMap = new HashMap<String,String>();
-				  paramMap.put("fileUniqueName", uniqueName);
+				  paramMap.put("fileUniqueName", uniqueName+fileExtension);
 				  paramMap.put("fileRealName", fileRealName);
 				  paramMap.put("fileSize", size);
 				  paramMap.put("fileExtension", fileExtension);
@@ -237,12 +247,17 @@ public class BoardServiceimpl implements BoardService{
 	
 	// 게시글 아이디로 글과 연결된 이미지 검색
 	@Override
-	public List<ConnectBoardImgVo> ConnectBoardImgBoardIdList(String boardId) {
+	public List<String> ConnectBoardImgBoardIdList(String boardId) {
 		Map<String, String> paramMap = new HashMap<String,String>();		  
 		  paramMap.put("boardId", boardId);
 		
 		List<ConnectBoardImgVo> list = ConnectBoardImgDao.ConnectBoardImgBoardIdListDao(paramMap);
-		return list;
+		
+		ArrayList<String> filenamelist = new ArrayList<String>();
+		for(int i=0; i<list.size(); i++) {
+			filenamelist.add(list.get(i).getFileUniqueName());
+		}
+		return filenamelist;
 	}
 	
 	// 댓글 작성
@@ -346,7 +361,6 @@ public class BoardServiceimpl implements BoardService{
 		Map<String, String> paramMap = new HashMap<String,String>();
 		paramMap.put("boardId", boardId);
 		List<BoardTextInfoVo> result = BoardCommentDao.BoardCommentBoardIdListDao(paramMap);
-		// TODO Auto-generated method stub
 		return result;
 	}
 	
@@ -366,7 +380,7 @@ public class BoardServiceimpl implements BoardService{
 	//추천 관련
 	//해당 게시글에 추천 누름
 	@Override
-	public int BoardRecommendPost(String token, BoardRecommendVo BoardRecommendVo) {
+	public int BoardRecommendPost(String token, String boardId, String boardType) {
 		String userid = JwtUtil.getUserIdFromToken(token);
 		String username = JwtUtil.getUsernameFromToken(token);
 		
@@ -374,8 +388,8 @@ public class BoardServiceimpl implements BoardService{
 		Map<String, String> paramMap = new HashMap<String,String>();
 		paramMap.put("userId", userid);
 		paramMap.put("username", username);
-		paramMap.put("boardId", BoardRecommendVo.getBoardId());
-		paramMap.put("boardType", BoardRecommendVo.getBoardType());
+		paramMap.put("boardId", boardId);
+		paramMap.put("boardType", boardType);
 		
 		int result = BoardRecommendDao.BoardRecommendPostDao(paramMap);
 		
@@ -397,13 +411,21 @@ public class BoardServiceimpl implements BoardService{
 	
 	// 해당 유저가 추천 누른 게시글 아이디, 타입
 	@Override
-	public List<BoardRecommendVo> BoardRecommendSerch(String token) {
+	public int BoardRecommendSerch(String token, String boardId) {
 		String userid = JwtUtil.getUserIdFromToken(token);
 
 		Map<String, String> paramMap = new HashMap<String,String>();
 		paramMap.put("userId", userid);
+		paramMap.put("boardId", boardId);
 		
-		List<BoardRecommendVo> result = BoardRecommendDao.BoardRecommendSerchDao(paramMap);
+		int result = BoardRecommendDao.BoardRecommendSerchDao(paramMap);
+		return result;
+	}
+	@Override
+	public int BoardRecommendCountSerch(String boardId){
+		Map<String, String> paramMap = new HashMap<String,String>();
+		paramMap.put("boardId", boardId);
+		int result = BoardRecommendDao.BoardRecommendCountSerchDao(paramMap);
 		return result;
 	}
 	
@@ -425,26 +447,52 @@ public class BoardServiceimpl implements BoardService{
 		
 		return result;
 	}
-	
+	// 스크랩 삭제
 	@Override
-	public int BoardScrapDelete(String token, String boardId) {
+	public int BoardScrapDelete(String token, BoardScrapVo BoardScrapVo) {
 		String userid = JwtUtil.getUserIdFromToken(token);
 
 		Map<String, String> paramMap = new HashMap<String,String>();
 		paramMap.put("userId", userid);
-		paramMap.put("boardId", boardId);
+		paramMap.put("boardId", BoardScrapVo.getBoardId());
+		paramMap.put("boardType", BoardScrapVo.getBoardType());
 		
 		int result = BoardScrapDao.BoardScrapDeleteDao(paramMap);
 		return result;
 	}
+	//유저 아이디로 스크랩 검색
 	@Override
-	public List<BoardScrapVo> BoardScrapUserIdList(String token, String boardId) {
+	public List<BoardScrapVo> BoardScrapUserIdList(String token) {
 		String userid = JwtUtil.getUserIdFromToken(token);
-
+		
 		Map<String, String> paramMap = new HashMap<String,String>();
 		paramMap.put("userId", userid);
 		
 		List<BoardScrapVo> result = BoardScrapDao.BoardScrapUserIdListDao(paramMap);
 		return result;
-	}	
+	}
+	//유저 아이디로 스크랩 검색
+		@Override
+		public List<BoardScrapVo> BoardScrapBoardTypeList(String token, String boardType) {
+			String userid = JwtUtil.getUserIdFromToken(token);
+			
+			Map<String, String> paramMap = new HashMap<String,String>();
+			paramMap.put("userId", userid);
+			paramMap.put("boardType", boardType);
+			
+			List<BoardScrapVo> result = BoardScrapDao.BoardScrapBoardTypeListDao(paramMap);
+			return result;
+		}
+		
+		@Override
+		public List<BoardScrapBoardInfoVo> BoardScrapBoardInfoList(String token){
+			String userid = JwtUtil.getUserIdFromToken(token);
+			
+			Map<String, String> paramMap = new HashMap<String,String>();
+			paramMap.put("userId", userid);
+			
+			List<BoardScrapBoardInfoVo> result = BoardScrapDao.BoardScrapBoardInfoListDao(paramMap);
+			
+			return result;
+		}
 }
