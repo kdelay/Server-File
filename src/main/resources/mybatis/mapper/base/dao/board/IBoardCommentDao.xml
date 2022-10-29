@@ -13,13 +13,26 @@
         select * from boardcomment where board_id = #{boardId} order by comment_create_at DESC;
     </select>
     
-    
-    <select id="BoardCommentLayer1ListDao" resultType="com.example.demo.board.vo.BoardCommentVo" parameterType="java.util.HashMap">
-        select * from boardcomment where board_id = #{boardId} and comment_layer = 1;
+    <!-- 모바일용 조회 레이어1 댓글 정보와 그 댓글의 레이어2 댓글(대댓글) 수를 포함하여 리턴  -->
+    <select id="BoardCommentLayer1ListDao" resultType="com.example.demo.board.vo.BoardCommentLayer1InfoVo" parameterType="java.util.HashMap">
+        WITH comment_list1 AS(
+		SELECT board_id, board_type, comment_id, comment_content, comment_layer,  comment_create_at, user_id, user_nickname 
+		FROM boardcomment 
+		WHERE board_id = #{boardId} AND comment_layer = '1'),
+		comment_list2 AS(
+		SELECT board_id, comment_parents_id, comment_layer, COUNT(comment_id) AS child_comment_count
+		FROM boardcomment
+		GROUP BY comment_parents_id
+		HAVING comment_layer= '2' AND board_id = #{boardId})
+		SELECT c1.*, c2.child_comment_count 
+		FROM comment_list1 c1
+		LEFT JOIN  comment_list2 c2
+		ON (c1.board_id = c2.board_id AND c1.comment_id = c2.comment_parents_id)
+		ORDER BY c1.comment_create_at DESC
     </select>
     
     <select id="BoardCommentLayer2ListDao" resultType="com.example.demo.board.vo.BoardCommentVo" parameterType="java.util.HashMap">
-        select * from boardcomment where board_id = #{boardId} and comment_layer = 2;
+        select * from boardcomment where comment_parents_id = #{commentParentsId} and comment_layer = 2 ORDER BY comment_create_at DESC;
     </select>
     
     

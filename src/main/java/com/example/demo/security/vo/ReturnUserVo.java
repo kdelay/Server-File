@@ -1,25 +1,16 @@
 package com.example.demo.security.vo;
-//기본 유저 테이블 정보 쿼리 서치시 이걸로 받음 
-public class UserVo {
+
+import java.time.LocalDateTime;
+// 유저 정보 확인 작업에서 리턴에 필요한 Vo
+public class ReturnUserVo {
 	private int userId	    ;
 	private String username     ;
-	private String password   ;
 	private String userRole        ;
-	private String userEmail        ;
-	private String emailCode;
 	private String userNickName    ;
 	private String userGender        ;
 	private String userDOB        ;
-	private String usercreateAT        ;
 	private String userupdateAT        ;
 	
-
-	public String getEmailCode() {
-		return emailCode;
-	}
-	public void setEmailCode(String emailCode) {
-		this.emailCode = emailCode;
-	}
 	public int getUserId() {
 		return userId;
 	}
@@ -32,24 +23,13 @@ public class UserVo {
 	public void setUsername(String username) {
 		this.username = username;
 	}
-	public String getPassword() {
-		return password;
-	}
-	public void setPassword(String password) {
-		this.password = password;
-	}
 	public String getUserRole() {
 		return userRole;
 	}
 	public void setUserRole(String userRole) {
 		this.userRole = userRole;
 	}
-	public String getUserEmail() {
-		return userEmail;
-	}
-	public void setUserEmail(String userEmail) {
-		this.userEmail = userEmail;
-	}
+	
 	public String getUserNickName() {
 		return userNickName;
 	}
@@ -68,17 +48,13 @@ public class UserVo {
 	public void setUserDOB(String userDOB) {
 		this.userDOB = userDOB;
 	}
-	public String getUsercreateAT() {
-		return usercreateAT;
-	}
-	public void setUsercreateAT(String usercreateAT) {
-		this.usercreateAT = usercreateAT;
-	}
 	public String getUserupdateAT() {
 		return userupdateAT;
 	}
 	public void setUserupdateAT(String userupdateAT) {
 		this.userupdateAT = userupdateAT;
-	}	
+	}
+	
+
 
 }

@@ -20,6 +20,7 @@ import com.example.demo.board.dao.BoardRecommendDao;
 import com.example.demo.board.dao.BoardScrapDao;
 import com.example.demo.board.dao.BoardTextInfoDao;
 import com.example.demo.board.dao.ConnectBoardImgDao;
+import com.example.demo.board.vo.BoardCommentLayer1InfoVo;
 import com.example.demo.board.vo.BoardCommentVo;
 import com.example.demo.board.vo.BoardImgInfoVo;
 import com.example.demo.board.vo.BoardScrapBoardInfoVo;
@@ -285,8 +286,9 @@ public class BoardServiceimpl implements BoardService{
 		if(BoardCommentVo.getCommentParentsId() != null) {
 			paramMap.put("commentParentsId", BoardCommentVo.getCommentParentsId());
 			paramMap.put("commentLayer", "2");
+		}else {
+			paramMap.put("commentLayer", "1");
 		}
-		paramMap.put("commentLayer", "1");
 		paramMap.put("commentContent", BoardCommentVo.getCommentContent());
 		paramMap.put("commentCreateAt", currentout.substring(0, 19));
 		paramMap.put("commentUpdateAt", currentout.substring(0, 19));
@@ -350,30 +352,39 @@ public class BoardServiceimpl implements BoardService{
 	
 	//boardid의 댓글, 대댓글 몰 리스트
 	@Override
-	public List<BoardTextInfoVo> BoardCommentAllList() {
-		List<BoardTextInfoVo> result = BoardCommentDao.BoardCommentAllListDao();
+	public List<BoardCommentVo> BoardCommentAllList() {
+		List<BoardCommentVo> result = BoardCommentDao.BoardCommentAllListDao();
 		return result;
 	}
 	
-	//개시글 아이디로 연관 댓글 검색
+	//개시글 아이디로 연관 댓글 검색 => 최근 시간 기준 all list 검색 
 	@Override
-	public List<BoardTextInfoVo> BoardCommentBoardIdList(String boardId) {
+	public List<BoardCommentVo> BoardCommentBoardIdList(String boardId) {
 		Map<String, String> paramMap = new HashMap<String,String>();
 		paramMap.put("boardId", boardId);
-		List<BoardTextInfoVo> result = BoardCommentDao.BoardCommentBoardIdListDao(paramMap);
+		List<BoardCommentVo> result = BoardCommentDao.BoardCommentBoardIdListDao(paramMap);
 		return result;
 	}
 	
-	///////////////////////////// 레이어 마다 검색 기능 임
+	// 해당 개시글의 댓글 리스트 정보 => 댓글이 가지는 대댓글 수 까지 포함할 예정
+	//모바일용 조회 레이어1 댓글 정보와 그 댓글의 레이어2 댓글(대댓글) 수를 포함하여 리턴
 	@Override
-	public List<BoardTextInfoVo> BoardCommentLayer1List(Map<String, String> map) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<BoardCommentLayer1InfoVo> BoardCommentLayer1List(String boardId) {
+		Map<String, String> paramMap = new HashMap<String,String>();
+		paramMap.put("boardId", boardId);
+		
+		List<BoardCommentLayer1InfoVo> result = BoardCommentDao.BoardCommentLayer1ListDao(paramMap);
+		return result;
 	}
+	
+	//모바일용 조회 댓글에 딸린 레이어2 정보(대댓글) 조회
 	@Override
-	public List<BoardTextInfoVo> BoardCommentLayer2List(Map<String, String> map) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<BoardCommentVo> BoardCommentLayer2List(String commentParentsId) {
+		Map<String, String> paramMap = new HashMap<String,String>();
+		paramMap.put("commentParentsId", commentParentsId);
+		
+		List<BoardCommentVo> result = BoardCommentDao.BoardCommentLayer2ListDao(paramMap);
+		return result;
 	}
 	///////////////////////////// 의미불명
 	

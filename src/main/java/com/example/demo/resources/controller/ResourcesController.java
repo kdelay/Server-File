@@ -43,8 +43,9 @@ public class ResourcesController {
 	}
 	
 	@GetMapping("/api/v1/resources/weather/{weather}")
-	public List<String> Weather(@PathVariable(name="weather") int weather){
-		List<String> result = ResourcesService.WeatherIdList(weather);
+	public List<String> Weather(@PathVariable(name="weather") String weather){
+		int weatherint = Integer.parseInt(weather);
+		List<String> result = ResourcesService.WeatherIdList(weatherint);
 		return result;
 	}
 

@@ -1,12 +1,10 @@
 package com.example.demo.security.jwt.util;
 
-import java.text.ParseException;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.springframework.cglib.core.internal.Function;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -78,6 +76,16 @@ public class JwtUtil {
 //        System.out.println("getUsernameFormToken subject = {}"+ username);
         return username;
     }
+    public String getuserUserupdateATFromToken(String token) {
+    	String username = String.valueOf(extractAllClaims(token).get("userupdateAT"));
+//        System.out.println("getUsernameFormToken subject = {}"+ username);
+        return username;
+    }
+    public String getuserUserEmailFromToken(String token) {
+    	String username = String.valueOf(extractAllClaims(token).get("userEmail"));
+//        System.out.println("getUsernameFormToken subject = {}"+ username);
+        return username;
+    }
     
     //------------------------------------------------------------------------
   
@@ -113,11 +121,12 @@ public class JwtUtil {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", username.getUserId());
         claims.put("username", username.getUsername());
+        claims.put("userEmail", username.getUserEmail());
         claims.put("userGender", username.getUserGender());
         claims.put("userDOB", username.getUserDOB());
         claims.put("userNickName", username.getUserNickName());
         claims.put("userRole", username.getUserRole());
-        
+        claims.put("userupdateAT", username.getUserupdateAT());
         
         return createToken(claims, user);
     }

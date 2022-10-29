@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.board.service.BoardService;
+import com.example.demo.board.vo.BoardCommentLayer1InfoVo;
 import com.example.demo.board.vo.BoardCommentVo;
 import com.example.demo.board.vo.BoardInfoVo;
 import com.example.demo.board.vo.BoardScrapBoardInfoVo;
@@ -146,10 +147,22 @@ public class BoardController {
 			return "fail";
 		}
 	}
-		
+	//boardid의 댓글, 대댓글 몰 리스트	
 	@GetMapping("/api/v1/commentlist/{boardid}")
-	public List<BoardTextInfoVo> commentlist(@PathVariable(name="boardid") String boardid){
-	    List<BoardTextInfoVo> list1 = BoardService.BoardCommentBoardIdList(boardid);
+	public List<BoardCommentVo> commentlist(@PathVariable(name="boardid") String boardid){
+	    List<BoardCommentVo> list1 = BoardService.BoardCommentBoardIdList(boardid);
+	       return list1;       
+	   }
+	//모바일용 조회 레이어1 댓글 정보와 그 댓글의 레이어2 댓글(대댓글) 수를 포함하여 리턴
+	@GetMapping("/api/v1/commentlist/layer1/{boardid}")
+	public List<BoardCommentLayer1InfoVo> commentlistlayer1(@PathVariable(name="boardid") String boardid){
+	    List<BoardCommentLayer1InfoVo> list1 = BoardService.BoardCommentLayer1List(boardid);
+	       return list1;       
+	   }
+	//모바일용 조회 댓글에 딸린 레이어2 정보(대댓글) 조회
+	@GetMapping("/api/v1/commentlist/layer2/{commentParentsId}")
+	public List<BoardCommentVo> commentlayer2list(@PathVariable(name="commentParentsId") String commentParentsId){
+	    List<BoardCommentVo> list1 = BoardService.BoardCommentLayer2List(commentParentsId);
 	       return list1;       
 	   }
 	

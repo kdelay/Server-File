@@ -49,7 +49,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable().authorizeRequests().antMatchers("/api/v1/login", "/api/v1/signup", "/api/v1/signup/**",
         		"/api/v1/boardlist", "/api/v1/boardlist/**", "/api/v1/boardimgconnect/**",
         		"/api/v1/displayimg/**","/api/v1/commentlist/**",
-        		"/api/v1/resources/**")
+        		"/api/v1/resources/**", "/api/v1/mail/**","/api/v1/search/**")
                 .permitAll().anyRequest().authenticated()
                 .and().exceptionHandling().and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);

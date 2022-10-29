@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.demo.board.vo.BoardCommentLayer1InfoVo;
 import com.example.demo.board.vo.BoardCommentVo;
 import com.example.demo.board.vo.BoardImgInfoVo;
 import com.example.demo.board.vo.BoardScrapBoardInfoVo;
@@ -63,16 +64,16 @@ public interface BoardService {
 	//public int BoardCommentCountDao(Map<String, String> map);
 	
 	//boardid의 댓글, 대댓글 몰 리스트
-	public List<BoardTextInfoVo> BoardCommentAllList();
+	public List<BoardCommentVo> BoardCommentAllList();
 	
 	//개시글 아이디로 연관 댓글 검색
-	public List<BoardTextInfoVo> BoardCommentBoardIdList(String boardId);
+	public List<BoardCommentVo> BoardCommentBoardIdList(String boardId);
 	
-	//boardid 댓글 리스트
-	public List<BoardTextInfoVo> BoardCommentLayer1List(Map<String, String> map);
+	//모바일용 조회 레이어1 댓글 정보와 그 댓글의 레이어2 댓글(대댓글) 수를 포함하여 리턴
+	public List<BoardCommentLayer1InfoVo> BoardCommentLayer1List(String boardId);
 
-	//boardid 대댓글 리스트
-	public List<BoardTextInfoVo> BoardCommentLayer2List(Map<String, String> map);
+	//모바일용 조회 댓글에 딸린 레이어2 정보(대댓글) 조회
+	public List<BoardCommentVo> BoardCommentLayer2List(String commentParentsId);
 	
 	
 	
